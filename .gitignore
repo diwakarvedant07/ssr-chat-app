@@ -121,10 +121,7 @@ dist
 
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
-<<<<<<< HEAD
 .vscode
-=======
->>>>>>> 0ef20e901fbee6bb1a2eae6407f46b6cab2db1d9
 
 # yarn v2
 .yarn/cache
