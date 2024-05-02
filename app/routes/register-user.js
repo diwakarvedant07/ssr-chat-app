@@ -19,7 +19,8 @@ router.post("/" , async (req, res) => {
 router.get("/checkIp/:ip" , async (req, res) => {
     var ip = req.params.ip
     try {
-    var data = UserModel.findOne({ip : ip});
+    var data = await UserModel.findOne({ip : ip});
+    console.log(data)
     res.status(201).send(data);
     } catch (err) {
         console.log(err)

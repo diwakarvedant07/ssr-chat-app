@@ -1,4 +1,5 @@
 var username = prompt("what is your username")
+const apiUrl = 'http://172.16.6.180:5555'
 
 var obj = {
     name: username,
@@ -6,7 +7,7 @@ var obj = {
 }
 
 try {
-    var response = fetch("http://172.20.10.2:5555/register", {
+    var response = fetch(apiUrl + "/register", {
         method: "POST",
         headers: {
           "content-type": "application/json",
