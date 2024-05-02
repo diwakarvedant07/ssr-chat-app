@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
 
     const chatContainer = document.querySelector('.chat-container')
+    var allChats = []
+    const apiUrl = 'http://172.16.6.180:5555'
 
     var User = {
         name: "anonymous",
@@ -8,6 +10,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     getUserName()
+    getAllChats()
+    allChats.forEach((message)=>{
+        createMessageCard(message)
+    })
 
     document.querySelector('.input-btn').addEventListener('click', async function () {
         var message = document.querySelector('.input-box')
@@ -18,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
             message: message.value
         }
         try {
-            var response = await fetch("http://172.20.10.2:5555/chat", {
+            var response = await fetch(apiUrl + "/chat", {
                 method: "POST",
                 headers: {
                     "content-type": "application/json",
@@ -30,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
 
-        createMessageCard(message.value)
+        createMessageCard(obj)
         message.value = '';
     })
 
@@ -40,11 +46,11 @@ document.addEventListener('DOMContentLoaded', function () {
         messageBox.setAttribute('class', 'message-box');
         messageBox.innerHTML = `
             <div class="user-details">
-                ${User.name}
+                ${message.user}
             </div>
 
             <div class="message">
-                ${message}
+                ${message.message}
             </div>
 
         `
@@ -52,10 +58,27 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     async function getUserName() {
+        console.log("hello")
         const ip = document.getElementById("ipaddress").innerHTML
+        console.log("found ip:" , ip)
 
         try {
-            var response = await fetch(`http://172.20.10.2:5555/register/checkIp/${ip}`, {
+            var response = await fetch(apiUrl + `/register/checkIp/${ip}`, {
+                method: "GET",
+            });
+
+            var data = await response.json();
+            User = data;
+            console.log(User)
+
+        } catch (error) {
+            console.log(error.stack)
+        }
+    }
+
+    async function getAllChats() {
+        try {
+            var response = await fetch(apiUrl + `/chat`, {
                 method: "GET",
                 headers: {
                     "content-type": "application/json",
@@ -63,8 +86,12 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             var data = await response.json();
-            User = data;
-            console.log(User)
+            allChats = data;
+            console.log(allChats)
+
+            allChats.forEach((chat)=>{
+                createMessageCard(chat)
+            })
 
         } catch (error) {
             console.log(error)

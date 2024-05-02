@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
   },
   ip: {
     type: String,
-    required: true
+    required: false
   }
 });
 

@@ -16,13 +16,12 @@ const UserModel = require('./app/models/user-model.js');
 // Set the view engine to EJS
 app.set('view engine', 'ejs');
 
+app.use(cors());
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, '/public')));
 
 app.use(express.json());
-app.use(cors());
 
-console.log("ergs")
 
 const UserChatRouter = require("./app/routes/user-chat.js");
 app.use("/chat", UserChatRouter);
@@ -40,12 +39,14 @@ db.once("open", () => console.log("[DATABASE : CONNECTED]"));
 // Define a route for the home page
 app.get('/', async (req, res) => {
   
-  var clientIp = requestIp.getClientIp(req)
+  var clientIp = await requestIp.getClientIp(req)
   
   clientIp = clientIp.split('f:')[1]
+
   try {
-      var response = await UserModel.find({ip: clientIp})
-      if(!response) {
+      var response = await UserModel.find({ip: `${clientIp}`})
+      
+      if(response.length == 0) {
         console.log("[REGISTER ROUTE]")
           return res.render('register', { ip: `${clientIp}` });
       }
