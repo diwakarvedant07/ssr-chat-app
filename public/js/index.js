@@ -1,8 +1,11 @@
 document.addEventListener('DOMContentLoaded', function () {
 
+
     const chatContainer = document.querySelector('.chat-container')
     var allChats = []
-    const apiUrl = 'http://172.16.6.180:5555'
+    const apiUrl = 'http://172.16.6.178:5555'
+    var apiKey
+    var Token
 
     var User = {
         name: "anonymous",
@@ -10,10 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     getUserName()
-    getAllChats()
-    allChats.forEach((message)=>{
-        createMessageCard(message)
-    })
+
 
     document.querySelector('.input-btn').addEventListener('click', async function () {
         var message = document.querySelector('.input-box')
@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 method: "POST",
                 headers: {
                     "content-type": "application/json",
+                    "x-access-token": Token
                 },
                 body: JSON.stringify(obj),
             });
@@ -39,6 +40,20 @@ document.addEventListener('DOMContentLoaded', function () {
         createMessageCard(obj)
         message.value = '';
     })
+
+    var inputBox = document.querySelector('.input-box')
+
+    inputBox.addEventListener("keypress", function (event) {
+        // If the user presses the "Enter" key on the keyboard
+        if (event.key === "Enter") {
+            // Cancel the default action, if needed
+            event.preventDefault();
+            // Trigger the button element with a click
+            document.querySelector(".input-btn").click();
+        }
+    });
+
+
 
 
     function createMessageCard(message) {
@@ -55,21 +70,36 @@ document.addEventListener('DOMContentLoaded', function () {
 
         `
         chatContainer.appendChild(messageBox)
+
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        window.scrollTo(0, document.body.scrollHeight);
+
     }
 
     async function getUserName() {
-        console.log("hello")
+        apiKey = document.getElementById("babaGanush").innerHTML
         const ip = document.getElementById("ipaddress").innerHTML
-        console.log("found ip:" , ip)
+        //console.log("found ip:", ip)
 
         try {
             var response = await fetch(apiUrl + `/register/checkIp/${ip}`, {
                 method: "GET",
+                headers: {
+                    "x-auth-token": apiKey
+                }
+            }).then((response) => response.json()).then((data) => {
+                //console.log(data)
+                User = data.data;
+                Token = data.token
+
+                getAllChats()
+
+                allChats.forEach((message) => {
+                    createMessageCard(message)
+                })
             });
 
-            var data = await response.json();
-            User = data;
-            console.log(User)
+
 
         } catch (error) {
             console.log(error.stack)
@@ -82,14 +112,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 method: "GET",
                 headers: {
                     "content-type": "application/json",
+                    "x-access-token": Token
                 },
             });
 
             var data = await response.json();
             allChats = data;
-            console.log(allChats)
+            //console.log(allChats)
 
-            allChats.forEach((chat)=>{
+            allChats.forEach((chat) => {
                 createMessageCard(chat)
             })
 

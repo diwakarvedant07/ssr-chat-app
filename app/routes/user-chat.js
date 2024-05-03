@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const ChatModel = require("../models/chat-model.js");
 const { get } = require("mongoose");
+const verifyJWT = require("../middleware/verify-jwt.js");
 
 
-router.get("/" , async (req, res) => {
+router.get("/" ,verifyJWT, async (req, res) => {
     try {
     var data = await ChatModel.find({});
     
@@ -16,8 +17,9 @@ router.get("/" , async (req, res) => {
     
 });
 
-router.post("/" , async (req, res) => {
+router.post("/" ,verifyJWT, async (req, res) => {
     try {
+        req.body.user = res.decoded.user
     var chatModel = new ChatModel(req.body);
     await chatModel.save();
     res.status(201).send(chatModel);

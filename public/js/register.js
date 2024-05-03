@@ -1,5 +1,5 @@
 var username = prompt("what is your username")
-const apiUrl = 'http://172.16.6.180:5555'
+const apiUrl = 'http://172.16.6.178:5555'
 
 var obj = {
     name: username,
@@ -11,6 +11,7 @@ try {
         method: "POST",
         headers: {
           "content-type": "application/json",
+          "x-auth-token": document.getElementById("babaGanush").innerHTML
         },
         body: JSON.stringify(obj),
       });
