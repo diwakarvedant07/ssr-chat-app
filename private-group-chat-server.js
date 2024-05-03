@@ -9,6 +9,12 @@ const app = express();
 const path = require('path');
 const ejs = require('ejs')
 const rateLimit = require('express-rate-limit');
+// SOCKET
+const http = require('http');
+const socketIo = require('socket.io')
+const server = http.createServer(app); // Create an HTTP server instance
+const io = socketIo(server); // Pass the HTTP server instance to Socket.IO
+const socketHandlers = require('./app/handlers/socket-handler')
 
 const UserModel = require('./app/models/user-model.js');
 
@@ -56,6 +62,10 @@ const db = mongoose.connection;
 db.on("error", (error) => console.error("[ERROR]", error));
 db.once("open", () => console.log("[DATABASE : CONNECTED]"));
 
+// Socket.IO logic
+//Socket Code
+socketHandlers(io);
+
 // Define a route for the home page
 app.get('/', async (req, res) => {
 
@@ -71,8 +81,8 @@ app.get('/', async (req, res) => {
     //     return res.status(201).send({ message: "Bro you just got cancelled , Perma-Ban !!" });
     // }
     if (response.length == 0) {
-      console.log("New User Joining The Chat")
-      console.log("[REGISTER ROUTE]")
+      // console.log("New User Joining The Chat")
+      // console.log("[REGISTER ROUTE]")
       return res.render('register', { ip: `${clientIp}` });
     }
     else {
@@ -81,8 +91,8 @@ app.get('/', async (req, res) => {
         return res.status(201).send({ message: "Bro you just got cancelled , Perma-Ban !!" });
       }
 
-      console.log(response[0].name, " Joined The Chat")
-      console.log("[INDEX ROUTE]")
+       console.log(response[0].name, " Joined The Chat")
+      // console.log("[INDEX ROUTE]")
       return res.render('index', {
         ip: `${clientIp}`,
         userName: response[0].name
@@ -102,4 +112,4 @@ app.get('/*', function (req, res) {
 // app.use("/register", RegisterRouter);
 
 
-app.listen(5555, () => console.log("[SERVER : STARTED]"));
+server.listen(5555, () => console.log("[SERVER : STARTED]"));

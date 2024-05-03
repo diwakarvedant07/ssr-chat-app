@@ -11,13 +11,14 @@ document.addEventListener('DOMContentLoaded', function () {
         name: "anonymous",
         ip: "bullshit"
     }
-
+    const socket = io(apiUrl);
     getUserName()
+    connectSockets()
 
 
     document.querySelector('.input-btn').addEventListener('click', async function () {
         var message = document.querySelector('.input-box')
-        console.log(message.value);
+        //console.log(message.value);
 
         var obj = {
             user: User.name,
@@ -32,6 +33,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 body: JSON.stringify(obj),
             });
+
+            sendMessageToSocket(obj)
         } catch (error) {
             console.log(error)
         }
@@ -128,4 +131,24 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log(error)
         }
     }
+
+    function connectSockets(){
+        
+        socket.on("connect_error", (err) => {
+            console.log("connect_error: ", err);
+        });
+        socket.on("connect", () => {
+            console.log("connected");
+        });
+
+        socket.on("Socket",(message)=>{
+            //console.log(message)
+            createMessageCard(message)
+        })
+    }
+
+    function sendMessageToSocket(message){
+        socket.emit("Socket",message)
+    }
+    
 })
