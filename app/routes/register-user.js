@@ -2,9 +2,13 @@ const express = require("express");
 const router = express.Router();
 const UserModel = require("../models/user-model.js");
 const { get } = require("mongoose");
+const verifyJWT = require("../middleware/verify-jwt.js");
+const verifyApiKey = require("../middleware/verify-api-key.js")
+const jwt = require("jsonwebtoken");
 
 
-router.post("/" , async (req, res) => {
+
+router.post("/" ,verifyApiKey, async (req, res) => {
     try {
     var userModel = new UserModel(req.body);
     await userModel.save();
@@ -16,15 +20,26 @@ router.post("/" , async (req, res) => {
     
 });
 
-router.get("/checkIp/:ip" , async (req, res) => {
+router.get("/checkIp/:ip" ,verifyApiKey, async (req, res) => {
     var ip = req.params.ip
     try {
     var data = await UserModel.findOne({ip : ip});
-    console.log(data)
-    res.status(201).send(data);
+
+    const currentTime = Math.floor(Date.now() / 1000); // Convert to seconds
+    token = jwt.sign(
+      {
+        user: data.name,
+        ip: data.ip,
+        iat: currentTime,
+        exp: currentTime + process.env.JWT_TOKEN_EXPIRY_TIME * 3600,
+      },
+      process.env.JWT_TOKEN_KEY
+    );
+    return res.status(201).send({ data: data, token: token });
+
     } catch (err) {
-        console.log(err)
-        res.status(400).send({resp : err});
+        console.log(err.stack)
+        res.status(400).send({resp : err.stack});
     }
     
 });

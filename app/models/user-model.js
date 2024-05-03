@@ -8,6 +8,10 @@ const userSchema = new mongoose.Schema({
   ip: {
     type: String,
     required: false
+  },
+  isBanned: {
+    type: Boolean,
+    default: false
   }
 });
 
