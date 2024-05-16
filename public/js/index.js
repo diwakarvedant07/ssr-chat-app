@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const chatContainer = document.querySelector('.chat-container')
     var allChats = []
-    const apiUrl = 'http://172.16.6.178:5555'
+    const apiUrl = 'http://172.16.4.211:5555'
     var apiKey
     var Token
 
@@ -11,13 +11,19 @@ document.addEventListener('DOMContentLoaded', function () {
         name: "anonymous",
         ip: "bullshit"
     }
-
+    const socket = io(apiUrl);
     getUserName()
+    connectSockets()
 
 
     document.querySelector('.input-btn').addEventListener('click', async function () {
+
+        document.body.style.zoom="100%"
+        
+        
+
         var message = document.querySelector('.input-box')
-        console.log(message.value);
+        //console.log(message.value);
 
         var obj = {
             user: User.name,
@@ -32,6 +38,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 body: JSON.stringify(obj),
             });
+
+            sendMessageToSocket(obj)
+            closeKeyboard()
+            //document.body.style.zoom="100%"
         } catch (error) {
             console.log(error)
         }
@@ -75,6 +85,15 @@ document.addEventListener('DOMContentLoaded', function () {
         window.scrollTo(0, document.body.scrollHeight);
 
     }
+
+    function closeKeyboard() {
+        // Create a temporary element and focus on it
+        const tmpElement = document.createElement('input');
+        document.body.appendChild(tmpElement);
+        tmpElement.focus();
+        // Remove the temporary element
+        document.body.removeChild(tmpElement);
+      }
 
     async function getUserName() {
         apiKey = document.getElementById("babaGanush").innerHTML
@@ -128,4 +147,46 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log(error)
         }
     }
+
+
+
+    function connectSockets(){
+        
+        socket.on("connect_error", (err) => {
+            console.log("connect_error: ", err);
+        });
+        socket.on("connect", () => {
+            console.log("connected");
+        });
+
+        socket.on("Socket",(message)=>{
+            //console.log(message)
+            createMessageCard(message)
+        })
+    }
+
+    function sendMessageToSocket(message){
+        socket.emit("Socket",message)
+    }
+
+
+    document.querySelector('.hello').addEventListener('click', some)
+    //hello(12,13)
+    //hello(24,45)
+    var some = hello(36,46)
+    some()
+    var some2 = hello(48,67)
+    some2()
+    document.querySelector('.hello').addEventListener('click', some)
+
+    function hello(arg1, arg2) {
+        console.log("getting triggered")
+        return function() {
+            console.log(arg1, " + ",arg2, "=", arg1+arg2)
+            document.querySelector('.hello').removeEventListener('click', some)
+            var some = hello(48,67)
+            document.querySelector('.hello').addEventListener('click', some)
+        }
+    }   
+    
 })
