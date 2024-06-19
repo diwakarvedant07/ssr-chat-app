@@ -31,7 +31,7 @@ const limiter = rateLimit({
     var updated = await data.save()
     // You can perform any action here, like logging or sending a response
     res.status(429).send({
-      message: 'Abe Chut DDOS karna band kar , tumse na hoga',
+      message:  DDOS prevention',
       From: 'Pocket Chat Team'
     });
   }
@@ -88,7 +88,7 @@ app.get('/', async (req, res) => {
     else {
 
       if (response[0].isBanned) {
-        return res.status(201).send({ message: "Bro you just got cancelled , Perma-Ban !!" });
+        return res.status(201).send({ message: "You just got cancelled , Perma-Ban !!" });
       }
 
        console.log(response[0].name, " Joined The Chat")
